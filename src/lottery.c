@@ -22,6 +22,13 @@ int numOfProcesses(char *fileName)
   return result - 2;
 }
 
+// As the name implies :D generates a random number
+// between the given ranges (inclusive)
+int randomInclusive(int min, int max)
+{
+  return min + rand() / (RAND_MAX / (max - min + 1) + 1);
+}
+
 main()
 {
   return 0;
