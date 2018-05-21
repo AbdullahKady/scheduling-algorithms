@@ -22,6 +22,21 @@ int numOfProcesses(char *fileName)
   return result - 2;
 }
 
+// Returns the nth (specified by num)
+// element in a csv string
+char *getElement(char *lines, int elementIndex)
+{
+  char *current;
+  for (current = strtok(lines, ",");
+       current && *current;
+       current = strtok(NULL, ",\n"))
+  {
+    if (!--elementIndex)
+      return current;
+  }
+  return NULL;
+}
+
 // As the name implies :D generates a random number
 // between the given ranges (inclusive)
 int randomInclusive(int min, int max)
