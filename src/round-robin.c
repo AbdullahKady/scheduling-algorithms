@@ -73,5 +73,76 @@ main()
     processID++;
   }
   fclose(file);
+  //THE LOGIC PART OF THE CODE >>
+  FILE *log = NULL;
+  log = fopen(outputFileName, "a");
+  start = clock(); //Initial clock just for logging
+  for (timeLine = 0, processID = 0; remain != 0;)
+  {
+    if (remainingTime[processID] <= quantumLength && remainingTime[processID] > 0)
+    {
+      fprintf(log, "\n");
+      fprintf(log, "Time %d: ", timeLine);
+      fprintf(log, "P%d ", processID + 1);
+      //CLOCK
+      tmpClock = clock();
+      while (((double)(clock() - tmpClock) / CLOCKS_PER_SEC) * 1000 < remainingTime[processID])
+      {
+      };
+      //CLOCK
+      timeLine += remainingTime[processID];
+      remainingTime[processID] = 0;
+      isFinished = 1;
+    }
+    else if (remainingTime[processID] > 0)
+    {
+      fprintf(log, "\n");
+      fprintf(log, "Time %d: ", timeLine);
+      fprintf(log, "P%d ", processID + 1);
+      fprintf(log, "Entering quantum ");
+      //CLOCK
+      tmpClock = clock();
+      while (((double)(clock() - tmpClock) / CLOCKS_PER_SEC) * 1000 < quantumLength)
+      {
+      };
+      //CLOCK
+      remainingTime[processID] -= quantumLength;
+      timeLine += quantumLength;
+    }
+    if (remainingTime[processID] == 0 && isFinished == 1)
+    {
+      remain--;
+      fprintf(log, " ||=> Done Turn Around: %d ", timeLine - arrivalTime[processID]);
+      fprintf(log, " || Waiting Time: %d ", timeLine - arrivalTime[processID] - cpuBurst[processID]);
+
+      waitTime += timeLine - arrivalTime[processID] - cpuBurst[processID];
+      turnAround += timeLine - arrivalTime[processID];
+      isFinished = 0;
+    }
+
+    if (processID == totalNumOfProcesses - 1)
+    {
+      processID = 0;
+    }
+    else if (arrivalTime[processID + 1] <= timeLine)
+    {
+      processID++;
+    }
+    else
+    {
+      processID = 0;
+    }
+  }
+
+  fprintf(log, "\n");
+  fprintf(log, "\nAverage Waiting Time= %f\n", waitTime * 1.0 / totalNumOfProcesses);
+  fprintf(log, "Average Turnaround Time = %f\n", turnAround * 1.0 / totalNumOfProcesses);
+  fclose(log);
+
+  printf("Success, output file has been written to %s\n", outputFileName);
+
+  end = clock();
+  double time_spent = ((double)(end - start) / CLOCKS_PER_SEC) * 1000;
+  printf("Time elapsed during simulation = %f msec\n", time_spent);
   return 0;
 }
